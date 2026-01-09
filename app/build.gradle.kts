@@ -9,7 +9,7 @@ android {
         version = release(36)
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 
@@ -28,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
