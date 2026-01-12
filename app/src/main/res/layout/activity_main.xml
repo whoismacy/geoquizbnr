@@ -12,7 +12,7 @@ android:orientation="vertical">
     android:id="@+id/question_text_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="center"
+    android:gravity="left"
     tools:text="@string/question_mideast" />
 
 <LinearLayout
@@ -33,6 +33,13 @@ android:orientation="vertical">
         android:layout_height="wrap_content"
         android:text="@string/false_button"/>
 </LinearLayout>
+    <Button
+        android:id="@+id/cheat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/cheat_button"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,6 +52,7 @@ android:orientation="vertical">
         android:text="@string/previous_button"
         app:icon="@drawable/arrow_left"
         app:iconGravity="textStart" />
+
 
         <Button
             android:id="@+id/next_button"
