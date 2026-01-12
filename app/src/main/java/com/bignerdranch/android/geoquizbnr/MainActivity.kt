@@ -1,21 +1,25 @@
 package com.bignerdranch.android.geoquizbnr
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.UiContext
 import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.android.geoquizbnr.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
-private const val EXTRA_ANSWER_IS_TRUE = "com.bignerdranch.android.geoquizbnr.answer_is_true"
 
 class MainActivity : AppCompatActivity() {
     private val quizViewModel: QuizViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+
+    private var cheatLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            // handle the result
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,19 +53,10 @@ class MainActivity : AppCompatActivity() {
         binding.cheatButton.setOnClickListener {
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivity(intent)
+//            startActivity(intent)
+            cheatLauncher.launch(intent)
         }
         updateQuestion()
-    }
-
-    companion object {
-        fun newIntent(
-            packageContext: Context,
-            answerIsTrue: Boolean,
-        ): Intent =
-            Intent(packageContext, CheatActivity::class.java).apply {
-                putExtra(EXTRA_ANSWER_IS_TRUE, answerIsTrue)
-            }
     }
 
     private fun updateQuestion() {
