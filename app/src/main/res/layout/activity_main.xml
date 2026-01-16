@@ -62,4 +62,10 @@ android:orientation="vertical">
             app:iconGravity="end"
             android:text="@string/next_button"/>
     </LinearLayout>
+    <TextView
+        android:id="@+id/android_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        />
 </LinearLayout>

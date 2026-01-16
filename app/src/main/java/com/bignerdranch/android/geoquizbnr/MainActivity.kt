@@ -1,10 +1,14 @@
 package com.bignerdranch.android.geoquizbnr
 
+import android.app.Activity
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.android.geoquizbnr.databinding.ActivityMainBinding
 
@@ -18,15 +22,24 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
         ) { result ->
-            // handle the result
+            if (result.resultCode == Activity.RESULT_OK) {
+                val hasCheated = result.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+                val returnedCheats = result.data?.getIntExtra(EXTRA_CURRENT_CHEAT_COUNT, 0) ?: 0
+                quizViewModel.currentQuestion.cheated = hasCheated
+                quizViewModel.currentQuestion.answered = true
+                quizViewModel.isCheater = hasCheated
+                quizViewModel.cheatCount += returnedCheats
+                updateButtonState()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate(Bundle?) called")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
+        val androidRelease = Build.VERSION.RELEASE ?: "Unknown"
+        val sdkVersion = Build.VERSION.SDK_INT_FULL
+        binding.androidVersion.text = "You are currently using Android: $androidRelease SDK Version $sdkVersion"
 
         binding.trueButton.setOnClickListener {
             checkAnswer(true)
@@ -51,9 +64,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.cheatButton.setOnClickListener {
+            if (quizViewModel.cheatCount >= 3) {
+                updateButtonState()
+                return@setOnClickListener
+            }
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-//            startActivity(intent)
             cheatLauncher.launch(intent)
         }
         updateQuestion()
@@ -61,24 +77,52 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateQuestion() {
         binding.questionTextView.setText(quizViewModel.currentQuestionText)
-        val enabled = !quizViewModel.currentQuestion.answered
-        binding.trueButton.isEnabled = enabled
-        binding.falseButton.isEnabled = enabled
+        updateButtonState()
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = quizViewModel.currentQuestionAnswer
-        val messageResId =
-            if (userAnswer == correctAnswer) {
-                quizViewModel.increaseCorrectCount()
-                R.string.correct_toast
-            } else {
-                R.string.incorrect_toast
+        if (quizViewModel.currentQuestionCheatState) {
+            Toast.makeText(this, R.string.judgment_toast, Toast.LENGTH_SHORT).show()
+            updateButtonState()
+        } else {
+            val correctAnswer = quizViewModel.currentQuestionAnswer
+            val messageResId =
+                when {
+                    quizViewModel.isCheater -> {
+                        R.string.judgment_toast
+                    }
+
+                    userAnswer == correctAnswer -> {
+                        quizViewModel.correct += 1
+                        R.string.correct_toast
+                    }
+
+                    else -> {
+                        R.string.incorrect_toast
+                    }
+                }
+            Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+            quizViewModel.isCheater = if (quizViewModel.isCheater) false else quizViewModel.isCheater
+            quizViewModel.currentQuestion.answered = true
+            if (quizViewModel.checkAllAnswered()) {
+                Toast.makeText(this, "Score: ${quizViewModel.percentage}%", Toast.LENGTH_LONG).show()
             }
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
-        quizViewModel.currentQuestion.answered = true
-        if (quizViewModel.checkAllAnswered()) {
-            Toast.makeText(this, "Score: ${quizViewModel.percentage}%", Toast.LENGTH_LONG).show()
+            updateButtonState()
+        }
+    }
+
+    private fun updateButtonState() {
+        val enabledAnswered = !quizViewModel.currentQuestion.answered
+        val enabledCheated = !quizViewModel.currentQuestion.cheated
+
+        binding.trueButton.isEnabled = enabledCheated && enabledAnswered
+        binding.falseButton.isEnabled = enabledCheated && enabledAnswered
+
+        if (quizViewModel.cheatCount >= 3 || quizViewModel.checkAllAnswered()) {
+            binding.cheatButton.isEnabled = false
+            Toast.makeText(this, R.string.cheating_cancel, Toast.LENGTH_SHORT).show()
         }
     }
 }
+
+// TODO: Dynamically show the Android Version at Runtime

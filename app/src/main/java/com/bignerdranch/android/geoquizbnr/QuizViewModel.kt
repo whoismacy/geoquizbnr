@@ -7,6 +7,7 @@ import kotlin.math.roundToInt
 
 private const val TAG = "QuizViewModel"
 const val CURRENT_INDEX_KEY = "CURRENT_INDEX_KEY"
+const val IS_CHEATER_KEY = "IS_CHEATER_KEY"
 
 class QuizViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -29,19 +30,25 @@ class QuizViewModel(
             Question(R.string.question_mideast, false),
         )
 
-//    private var currentIndex: Int = 0
-//        get() = savedStateHandle[CURRENT_INDEX_KEY] ?: 0
-//        set(value) = savedStateHandle.set(CURRENT_INDEX_KEY, value)
+    var isCheater: Boolean
+        get() = savedStateHandle[IS_CHEATER_KEY] ?: false
+        set(value) = savedStateHandle.set(IS_CHEATER_KEY, value)
+
     private var currentIndex: Int
         get() = savedStateHandle[CURRENT_INDEX_KEY] ?: 0
         set(value) = savedStateHandle.set(CURRENT_INDEX_KEY, value)
-    private var correct = 0
+
+    var correct: Int = 0
+    var cheatCount: Int = 0
 
     val currentQuestionText: Int
         get() = questionBank[currentIndex].textResId
 
     val currentQuestionAnswer: Boolean
         get() = questionBank[currentIndex].answer
+
+    val currentQuestionCheatState: Boolean
+        get() = questionBank[currentIndex].cheated
 
     val currentQuestion: Question
         get() = questionBank[currentIndex]
@@ -60,10 +67,6 @@ class QuizViewModel(
             } else {
                 currentIndex - 1
             }
-    }
-
-    fun increaseCorrectCount() {
-        correct += 1
     }
 
     fun checkAllAnswered(): Boolean = questionBank.all { question -> question.answered }
