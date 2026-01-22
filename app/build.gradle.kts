@@ -43,13 +43,13 @@ android {
 
 dependencies {
     val lifecycle_version = "2.10.0"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     //noinspection UseTomlInstead
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

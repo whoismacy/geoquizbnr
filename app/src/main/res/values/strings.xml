@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">geoquizbnr</string>
+    <string name="app_name" translatable="false">geoquizbnr</string>
     <string name="next_button">Next</string>
     <string name="previous_button">Previous</string>
     <string name="true_button">True</string>

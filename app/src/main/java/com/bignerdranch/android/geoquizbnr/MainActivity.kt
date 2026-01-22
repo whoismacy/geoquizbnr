@@ -1,14 +1,11 @@
 package com.bignerdranch.android.geoquizbnr
 
 import android.app.Activity
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.android.geoquizbnr.databinding.ActivityMainBinding
 
@@ -124,5 +121,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-// TODO: Dynamically show the Android Version at Runtime
